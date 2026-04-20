@@ -334,7 +334,7 @@ class _AdsCarouselState extends State<_AdsCarousel> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 220, // Increased height for better photo visibility
       child: Column(
         children: [
           Expanded(
@@ -348,7 +348,7 @@ class _AdsCarouselState extends State<_AdsCarousel> {
             ),
           ),
           if (widget.ads.length > 1) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -358,10 +358,10 @@ class _AdsCarouselState extends State<_AdsCarousel> {
                   (i) => AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: 8,
+                    width: i == _currentPage ? 12 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(4),
                       gradient: i == _currentPage
                           ? const LinearGradient(
                               colors: [AppColor.secondary, AppColor.secondary],
@@ -375,7 +375,6 @@ class _AdsCarouselState extends State<_AdsCarousel> {
                 ),
               ),
             ),
-
           ],
         ],
       ),
@@ -392,32 +391,20 @@ class _AdCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = ad.imageUrl;
-    final hasImage = url != null && url.isNotEmpty;
+    final hasImage = url != null && url.trim().isNotEmpty;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: AppColor.primary.withOpacity(0.01),
-        //     blurRadius: 18,
-        //     offset: const Offset(0, 6),
-        //     spreadRadius: -1,
-        //   ),
-        //   BoxShadow(
-        //     color: AppColor.textColor.withOpacity(0.06),
-        //     blurRadius: 8,
-        //     offset: const Offset(0, 2),
-        //   ),
-        // ],
+        color: Colors.grey.shade100,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Image layer - best display
+            // Image layer
             if (hasImage)
               Image.network(
                 url!,
@@ -426,49 +413,33 @@ class _AdCard extends StatelessWidget {
                 gaplessPlayback: true,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _buildPlaceholder(),
-                      Center(
-                        child: SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColor.primary.withOpacity(0.8),
-                            ),
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        ),
-                      ),
-                    ],
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
                   );
                 },
                 errorBuilder: (_, __, ___) => _buildPlaceholder(),
               )
             else
               _buildPlaceholder(),
-            // Overlay - optimized gradient for image visibility + title readability
+            
+            // Subtle Overlay - title at bottom
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(20, 56, 20, 24),
+                padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      Colors.grey.withOpacity(0.12),
-                      Colors.grey.withOpacity(0.55),
-                      AppColor.secondary.withOpacity(0.2),
+                      Colors.black.withOpacity(0.6),
                     ],
-                    stops: const [0.0, 0.4, 0.78, 1.0],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -477,22 +448,11 @@ class _AdCard extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.4,
-                    height: 1.35,
-                    // shadows: [
-                    //   Shadow(
-                    //     color: AppColor.textColor.withOpacity(0.5),
-                    //     offset: const Offset(0, 1),
-                    //     blurRadius: 4,
-                    //   ),
-                    //   Shadow(
-                    //     color: AppColor.textColor.withOpacity(0.3),
-                    //     offset: const Offset(0, 2),
-                    //     blurRadius: 8,
-                    //   ),
-                    // ],
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(blurRadius: 4, color: Colors.black45, offset: Offset(0, 1))
+                    ],
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

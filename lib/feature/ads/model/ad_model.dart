@@ -34,16 +34,21 @@ class AdModel {
         imageUrl = "$base$imageUrl";
       }
 
-      // 1. Force HTTPS to avoid Cleartext issues on Android/iOS
-      if (imageUrl.startsWith("http://")) {
-        imageUrl = imageUrl.replaceFirst("http://", "https://");
-      }
-
-      // 2. Encode non-ASCII characters (like Arabic) to make it a valid URI
+      // 1. We no longer force HTTPS here because we enabled Cleartext in Manifest, 
+      // and some local servers or specific CDNs might prefer HTTP.
+      
+      // 2. Encode non-ASCII characters (like Arabic) and spaces
       try {
-        // We use parse and toString to handle encoding correctly
-         imageUrl = Uri.tryParse(imageUrl)?.toString() ?? imageUrl;
-      } catch (_) {}
+        final String nonNullUrl = imageUrl.trim();
+        // Use Uri.parse and toString for standard encoding if possible, 
+        // fall back to encodeFull for legacy or complex strings.
+        final uri = Uri.parse(nonNullUrl);
+        imageUrl = uri.toString();
+      } catch (_) {
+        try {
+          imageUrl = Uri.encodeFull(imageUrl!); // imageUrl is not null here
+        } catch (__) {}
+      }
     }
 
     return AdModel(
