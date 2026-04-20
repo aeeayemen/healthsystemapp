@@ -1,6 +1,8 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:get/get.dart';
 import 'package:nutri_guide/core/class/status_request.dart';
 import 'package:nutri_guide/core/function/handel_data.dart';
@@ -46,15 +48,13 @@ class SignupController extends GetxController {
 
   Future<void> pickProfileImage() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: false,
-        withData: true,
-      );
-      if (result != null && result.files.single.name.isNotEmpty) {
-        profileImagePath = result.files.single.path;
-        profileImageName = result.files.single.name;
-        profileImageBytes = result.files.single.bytes;
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      
+      if (image != null) {
+        profileImagePath = image.path;
+        profileImageName = image.name;
+        profileImageBytes = await image.readAsBytes();
         update();
       }
     } catch (e) {
@@ -65,6 +65,7 @@ class SignupController extends GetxController {
       );
     }
   }
+
 
   /// Pick degree: PDF, DOC, DOCX, or images
   Future<void> pickDegreeFile() async {

@@ -47,6 +47,11 @@ class TipsMainController extends GetxController {
                   tempList.add(tipCat);
                 }
               } catch (_) {}
+            } else if (e["category_id"] == null || e["category_id"] == 0) {
+              if (!seenIds.contains(0)) {
+                seenIds.add(0);
+                tempList.add(TipCategory(id: 0, nameEn: "General", nameAr: "عامة"));
+              }
             }
           }
 

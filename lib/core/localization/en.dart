@@ -217,7 +217,6 @@ const Map<String, String> enTranslation = {
   "yearsOfExperience": "Years of Experience",
   "bio": "Professional Bio",
 
-  "bio": "Bio",
   "success": "Success",
   "ok": "OK",
   "sessionExpired": "Session expired, please login again",
