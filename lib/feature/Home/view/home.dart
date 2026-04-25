@@ -9,6 +9,7 @@ import 'package:nutri_guide/core/shared/widgets/drawer.dart';
 import 'package:nutri_guide/feature/ads/model/ad_model.dart';
 import 'package:nutri_guide/core/routes/app_route.dart';
 
+import '../../ads/view/ad_details_view.dart';
 import '../../home/controller/home_controller.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -401,65 +402,70 @@ class _AdCard extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Image layer
-            if (hasImage)
-              Image.network(
-                url!,
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-                gaplessPlayback: true,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
+        child: InkWell(
+          onTap: () => Get.to(() => AdDetailsView(ad: ad)),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Image layer
+              Hero(
+                tag: 'ad_${ad.id}',
+                child: hasImage
+                    ? Image.network(
+                        url!,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                        gaplessPlayback: true,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                      )
+                    : _buildPlaceholder(),
+              ),
+              
+              // Subtle Overlay - title at bottom
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.6),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
-                  );
-                },
-                errorBuilder: (_, __, ___) => _buildPlaceholder(),
-              )
-            else
-              _buildPlaceholder(),
-            
-            // Subtle Overlay - title at bottom
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.6),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
                   ),
-                ),
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    shadows: [
-                      Shadow(blurRadius: 4, color: Colors.black45, offset: Offset(0, 1))
-                    ],
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(blurRadius: 4, color: Colors.black45, offset: Offset(0, 1))
+                      ],
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
